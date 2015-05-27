@@ -7,175 +7,179 @@
  * @version   v1.4.8
  */
 
-  /* Sample html structure
+/* Sample html structure
 
-  <div class='tabs'>
-    <ul class='horizontal'>
-      <li><a href="#tab-1">Tab 1</a></li>
-      <li><a href="#tab-2">Tab 2</a></li>
-      <li><a href="#tab-3">Tab 3</a></li>
-    </ul>
-    <div id='tab-1'></div>
-    <div id='tab-2'></div>
-    <div id='tab-3'></div>
-  </div>
+ <div class='tabs'>
+ <ul class='horizontal'>
+ <li><a href="#tab-1">Tab 1</a></li>
+ <li><a href="#tab-2">Tab 2</a></li>
+ <li><a href="#tab-3">Tab 3</a></li>
+ </ul>
+ <div id='tab-1'></div>
+ <div id='tab-2'></div>
+ <div id='tab-3'></div>
+ </div>
 
-  */
+ */
 
-;(function($, window, undefined) {
-  "use strict";
+/*global define*/
+define(['jquery'], function(jQuery){
 
-  $.fn.tabslet = function(options) {
+    ;(function($, window, undefined) {
+        "use strict";
 
-    var defaults = {
-      mouseevent:   'click',
-      attribute:    'href',
-      animation:    false,
-      autorotate:   false,
-      pauseonhover: true,
-      delay:        2000,
-      active:       1,
-      controls:     {
-        prev: '.prev',
-        next: '.next'
-      }
-    };
+        $.fn.tabslet = function(options) {
 
-    var options = $.extend(defaults, options);
+            var defaults = {
+                mouseevent:   'click',
+                attribute:    'href',
+                animation:    false,
+                autorotate:   false,
+                pauseonhover: true,
+                delay:        2000,
+                active:       1,
+                controls:     {
+                    prev: '.prev',
+                    next: '.next'
+                }
+            };
 
-    return this.each(function() {
+            var options = $.extend(defaults, options);
 
-      var $this = $(this);
+            return this.each(function() {
 
-      // Autorotate
-      var elements = $this.find('> ul li'), i = options.active - 1; // ungly
+                var $this = $(this);
 
-      if ( !$this.data( 'tabslet-init' ) ) {
+                // Autorotate
+                var elements = $this.find('> ul li'), i = options.active - 1; // ungly
 
-        $this.data( 'tabslet-init', true );
+                if ( !$this.data( 'tabslet-init' ) ) {
 
-        // Ungly overwrite
-        options.mouseevent    = $this.data('mouseevent') || options.mouseevent;
-        options.attribute     = $this.data('attribute') || options.attribute;
-        options.animation     = $this.data('animation') || options.animation;
-        options.autorotate    = $this.data('autorotate') || options.autorotate;
-        options.pauseonhover  = $this.data('pauseonhover') || options.pauseonhover;
-        options.delay         = $this.data('delay') || options.delay;
-        options.active        = $this.data('active') || options.active;
+                    $this.data( 'tabslet-init', true );
 
-        $this.find('> div').hide();
-        if ( options.active ) {
-          $this.find('> div').eq(options.active - 1).show();
-          $this.find('> ul li').eq(options.active - 1).addClass('active');
-        }
+                    // Ungly overwrite
+                    options.mouseevent    = $this.data('mouseevent') || options.mouseevent;
+                    options.attribute     = $this.data('attribute') || options.attribute;
+                    options.animation     = $this.data('animation') || options.animation;
+                    options.autorotate    = $this.data('autorotate') || options.autorotate;
+                    options.pauseonhover  = $this.data('pauseonhover') || options.pauseonhover;
+                    options.delay         = $this.data('delay') || options.delay;
+                    options.active        = $this.data('active') || options.active;
 
-        var fn = eval(
+                    $this.find('> div').hide();
+                    if ( options.active ) {
+                        $this.find('> div').eq(options.active - 1).show();
+                        $this.find('> ul li').eq(options.active - 1).addClass('active');
+                    }
 
-          function() {
+                    var fn = eval(
 
-            $(this).trigger('_before');
+                        function() {
 
-            $this.find('> ul li').removeClass('active');
-            $(this).addClass('active');
-            $this.find('> div').hide();
+                            $(this).trigger('_before');
 
-            i = elements.index($(this));
+                            $this.find('> ul li').removeClass('active');
+                            $(this).addClass('active');
+                            $this.find('> div').hide();
 
-            var currentTab = $(this).find('a').attr(options.attribute);
+                            i = elements.index($(this));
 
-            if (options.animation) {
+                            var currentTab = $(this).find('a').attr(options.attribute);
 
-              $this.find(currentTab).animate( { opacity: 'show' }, 'slow', function() {
-                $(this).trigger('_after');
-              });
+                            if (options.animation) {
 
-            } else {
+                                $this.find(currentTab).animate( { opacity: 'show' }, 'slow', function() {
+                                    $(this).trigger('_after');
+                                });
 
-              $this.find(currentTab).show();
-              $(this).trigger('_after');
+                            } else {
 
-            }
+                                $this.find(currentTab).show();
+                                $(this).trigger('_after');
 
-            return false;
+                            }
 
-          }
+                            return false;
 
-        );
+                        }
 
-        var init = eval("$this.find('> ul li')." + options.mouseevent + "(fn)");
+                    );
 
-        init;
+                    var init = eval("$this.find('> ul li')." + options.mouseevent + "(fn)");
 
-        var t;
+                    init;
 
-        var forward = function() {
+                    var t;
 
-          i = ++i % elements.length; // wrap around
+                    var forward = function() {
 
-          options.mouseevent == 'hover' ? elements.eq(i).trigger('mouseover') : elements.eq(i).click();
+                        i = ++i % elements.length; // wrap around
 
-          if (options.autorotate) {
+                        options.mouseevent == 'hover' ? elements.eq(i).trigger('mouseover') : elements.eq(i).click();
 
-            clearTimeout(t);
+                        if (options.autorotate) {
 
-            t = setTimeout(forward, options.delay);
+                            clearTimeout(t);
 
-            $this.mouseover(function () {
+                            t = setTimeout(forward, options.delay);
 
-              if (options.pauseonhover) clearTimeout(t);
+                            $this.mouseover(function () {
+
+                                if (options.pauseonhover) clearTimeout(t);
+
+                            });
+
+                        }
+
+                    }
+
+                    if (options.autorotate) {
+
+                        t = setTimeout(forward, options.delay);
+
+                        $this.hover(function() {
+
+                            if (options.pauseonhover) clearTimeout(t);
+
+                        }, function() {
+
+                            t = setTimeout(forward, options.delay);
+
+                        });
+
+                        if (options.pauseonhover) $this.on( "mouseleave", function() { clearTimeout(t); t = setTimeout(forward, options.delay); });
+
+                    }
+
+                    var move = function(direction) {
+
+                        if (direction == 'forward') i = ++i % elements.length; // wrap around
+
+                        if (direction == 'backward') i = --i % elements.length; // wrap around
+
+                        elements.eq(i).click();
+
+                    }
+
+                    $this.find(options.controls.next).click(function() {
+                        move('forward');
+                    });
+
+                    $this.find(options.controls.prev).click(function() {
+                        move('backward');
+                    });
+
+                    $this.on ('destroy', function() {
+                        $(this).removeData();
+                    });
+
+                }
 
             });
 
-          }
+        };
 
-        }
+        $(document).ready(function () { $('[data-toggle="tabslet"]').tabslet(); });
 
-        if (options.autorotate) {
-
-          t = setTimeout(forward, options.delay);
-
-          $this.hover(function() {
-
-            if (options.pauseonhover) clearTimeout(t);
-
-          }, function() {
-
-            t = setTimeout(forward, options.delay);
-
-          });
-
-          if (options.pauseonhover) $this.on( "mouseleave", function() { clearTimeout(t); t = setTimeout(forward, options.delay); });
-
-        }
-
-        var move = function(direction) {
-
-          if (direction == 'forward') i = ++i % elements.length; // wrap around
-
-          if (direction == 'backward') i = --i % elements.length; // wrap around
-
-          elements.eq(i).click();
-
-        }
-
-        $this.find(options.controls.next).click(function() {
-          move('forward');
-        });
-
-        $this.find(options.controls.prev).click(function() {
-          move('backward');
-        });
-
-        $this.on ('destroy', function() {
-          $(this).removeData();
-        });
-
-      }
-
-    });
-
-  };
-
-  $(document).ready(function () { $('[data-toggle="tabslet"]').tabslet(); });
-
-})(jQuery);
+    })(jQuery);
+});
